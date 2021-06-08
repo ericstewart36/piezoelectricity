@@ -1,4 +1,4 @@
-# piezoelectricity
+# Piezoelectricity Codebase
 
 This repository contains the code base for the 3D finite element implementation of piezoelectricity used in Chapter 3 of my M.S. thesis for the Mechanical Engineering department at MIT. This thesis is publicly available from the MIT libraries (link to online version will be added when available).
 
