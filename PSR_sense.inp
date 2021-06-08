@@ -1,0 +1,157 @@
+******************************************************
+*Heading
+PSR Study
+**
+**	UNITS:	SI
+************************************************************************
+**			PARAMETERS
+************************************************************************
+*Parameter
+**
+** total simulation time (seconds)
+tload = 100.
+**
+*******************************
+****** Elastic Constants ******
+*******************************
+Eyoung = 3.6e9
+anu = 0.34
+*******************************
+******  Piezo Constants  ******
+*******************************
+E31 = -36.0e-3
+E32 = -60.0e-3
+E33 = -151.0e-3
+E24 = -62.0e-3
+E15 = -73.0e-3
+*******************************
+*** Permittivity Constants  ***
+*******************************
+permitt0 = 8.85e-12
+e11 = 6.90*permitt0
+e22 = 8.60*permitt0
+e33 = 10.23*permitt0
+*******************************
+****  Integer Parameters   ****
+*******************************
+nlSdv = 1
+ngSdv = 9
+nInt = 8
+nvars = nlSdv*nInt
+**
+** ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+** 			INPUTS
+** ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**
+** Declare user element
+*User Element,Nodes=8,Type=U1,Iproperties=2,Properties=10,Coordinates=3,Variables=1,Unsymm
+1,2,3,11
+**
+*include, input=PSR_geom_04.inp
+**
+*EQUATION
+2
+left,2,-1.0
+ref_node,2,1.0
+2
+left,1,-1.0
+ref_node,1,1.0
+2
+front,11,-1.0
+ref_node,11,1.0
+**
+*End Assembly
+**
+************************************************************************
+**			MATERIAL DEFINITION
+************************************************************************
+**
+** Material properties for the real mesh
+**
+*uel property,elset=Part-1-1.el_real
+<Eyoung>, <anu>, <E31>, <E32>, <E33>, <E24>, <E15>, <e11>,
+<e22>, <e33>, <nlSdv>, <ngSdv>
+**
+** Dummy mesh material properties
+**
+**
+*Material, name=umaterial
+**
+*Elastic
+1.e-20
+**
+*User output variables
+<ngSdv>
+**
+*Density
+1.0
+**
+*Specific heat
+1.0
+**
+**
+************************************************************************
+**			BOUNDARY CONDITIONS
+************************************************************************
+*boundary
+**front, 3
+back, 3
+back, 11
+right, 1
+**right, 2
+Part-1-1.1, 2
+Part-1-1.118, 2
+Part-1-1.117, 2
+Part-1-1.4, 2
+**
+************************************************************************
+**			INITIAL CONDITIONS
+************************************************************************
+**
+*Initial conditions, type=temperature
+Part-1-1.nall, 0.
+**ref_node, 0.
+**
+************************************************************************
+**			AMPLITUDE DEFINITION
+************************************************************************
+**
+*Amplitude, name=amp-2
+0.,0., 100., 1.
+*Amplitude, name=1Hz_sine, definition=periodic
+1, 6.283185, 0.0,0.0
+0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+*Amplitude, name=1Hz_cosine, definition=periodic
+1, 6.283185, 0.0,0.0
+1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+**
+**********************************************************************
+**			STEP DEFINITION
+**********************************************************************
+*Step, Name=Deform2, nlgeom=yes, unsymm=yes, inc=50000
+*Coupled temperature-displacement, deltmx=10000
+10,100.,1.e-15,10
+*CONTROLS, PARAMETERS=TIME INCREMENTATION
+,,,,,,,12,,,,,,
+**
+** 	DISPLACEMENT B.C.
+**
+** *boundary, type=velocity, amplitude=1Hz_cosine
+** ref_node,1,1,-0.001024e-3
+**
+*boundary, amplitude=amp-2
+ref_node,1,1,-0.08e-3
+**
+**	OUTPUTS
+**
+*Output, field, frequency=1
+*node output, nset=Part-1-1.nall
+u,nt
+*Element output, elset=Part-1-1.el_dummy
+e, le, uvarm
+**
+*Output, history
+*node output, nset=ref_node
+u1, nt11
+*End Step
+************************************************************************
